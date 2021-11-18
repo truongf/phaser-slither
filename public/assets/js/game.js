@@ -48,10 +48,8 @@ class BootScene extends Phaser.Scene {
     this.load.tilemapTiledJSON('map', 'assets/map/map.json');
     // our two characters
     this.load.image('player', 'assets/images/circle.png');
-    //  enemies
-    this.load.image('invader', 'assets/images/invader2.png');
-    this.load.image('demon', 'assets/images/food.png');
-    this.load.image('sword', 'assets/images/attack-icon.png');
+    //  food
+    this.load.image('food', 'assets/images/invader2.png');
     this.load.image('body', 'assets/images/circle-sm.png');
   }
 
@@ -84,7 +82,7 @@ class WorldScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     // create enemies
-    this.createEnemies();
+    this.createFoods();
     
     scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '15px', fill: '#000' });
 
@@ -271,16 +269,16 @@ class WorldScene extends Phaser.Scene {
     this.cameras.main.roundPixels = true; // avoid tile bleed
   }
 
-  createEnemies() {
+  createFoods() {
     var colors = [ 0xef658c, 0xff9a52, 0xffdf00, 0x31ef8c, 0x21dfff, 0x31aade, 0x5275de, 0x9c55ad, 0xbd208c ];
-    // where the enemies will be
+    // where the foods will be
     this.spawns = this.physics.add.group({
       classType: Phaser.GameObjects.Sprite
     });
     for (var i = 0; i < 100; i++) {
       const location = this.getValidLocation();
       // parameters are x, y, width, height
-      var enemy = this.spawns.create(location.x, location.y, 'invader');
+      var enemy = this.spawns.create(location.x, location.y, 'food');
       enemy.setTint(Phaser.Utils.Array.GetRandom(colors));
       enemy.setScale(Phaser.Math.FloatBetween(0.25, 0.35));
       enemy.body.setCollideWorldBounds(true);
@@ -288,7 +286,7 @@ class WorldScene extends Phaser.Scene {
     }
   }
 
-  moveEnemies () {
+  moveFoods () {
     this.spawns.getChildren().forEach((enemy) => {
       const randNumber = Math.floor((Math.random() * 4) + 1);
       switch(randNumber) {
@@ -312,11 +310,6 @@ class WorldScene extends Phaser.Scene {
       this.spawns.setVelocityX(0);
       this.spawns.setVelocityY(0);
     }, 500);
-  }
-
-  getEnemySprite() {
-    var sprites = ['golem', 'ent', 'demon', 'worm', 'wolf'];
-    return sprites[Math.floor(Math.random() * sprites.length)];
   }
 
   getValidLocation() {
@@ -389,22 +382,6 @@ class WorldScene extends Phaser.Scene {
         // this.player.anims.play('down', true);
       } else {
         // this.player.anims.stop();
-      }
-
-      if (Phaser.Input.Keyboard.JustDown(this.cursors.space) && !this.attacking && document.activeElement !== inputMessage) {
-        this.attacking = true;
-        setTimeout(() => {
-          this.attacking = false;
-          this.weapon.angle = 0;
-        }, 150);
-      }
-
-      if (this.attacking) {
-        if (this.weapon.flipX) {
-          this.weapon.angle -= 10;
-        } else {
-          this.weapon.angle += 10;
-        }
       }
 
       // emit player movement
